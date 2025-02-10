@@ -25,7 +25,7 @@ class CheckingAccountRestControllerTests {
 
 	@Test
 	void createAccount() {
-		Account account = new Account("Mary", BigDecimal.valueOf(100.00));
+		Account account = new Account("mary", BigDecimal.valueOf(100.00));
 		ResponseEntity<Void> response = restTemplate.postForEntity("/accounts", account, Void.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 	}
