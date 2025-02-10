@@ -58,9 +58,25 @@ class CheckingAccountRestControllerTests {
 	}
 
 	@Test
-	void accountDoesntExist() {
+	void noAccessIfNotAuthenticated() {
 		ResponseEntity<Account> res = restTemplate.getForEntity("/accounts/99", Account.class);
-		assertThat(res.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+		assertThat(res.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+	}
+
+	@Test
+	void shouldNotAccessAccountYouDontOwn() {
+		Account account = new Account("oz", BigDecimal.valueOf(350.99));
+		ResponseEntity<Void> response = restTemplate
+				.withBasicAuth("oz", "abc123")
+				.postForEntity("/accounts", account, Void.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+		URI location = response.getHeaders().getLocation();
+		ResponseEntity<String> responseAccount = restTemplate
+				.withBasicAuth("mary", "123987")
+				.getForEntity(location, String.class);
+
+		assertThat(responseAccount.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
 
 	@Test
