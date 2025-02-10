@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.Optional;
 
 @RestController
@@ -19,8 +20,8 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
-    private ResponseEntity<Account> getAccountByName(@PathVariable Long id) {
-        Optional<Account> account = accountRepository.findById(id);
+    private ResponseEntity<Account> getAccountById(@PathVariable Long id, Principal principal) {
+        Optional<Account> account = Optional.ofNullable(accountRepository.findByIdAndName(id, principal.getName()));
         if(account.isPresent()) {
             return ResponseEntity.ok(account.get());
         }
