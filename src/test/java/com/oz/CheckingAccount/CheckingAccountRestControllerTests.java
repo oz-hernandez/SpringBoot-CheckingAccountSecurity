@@ -26,18 +26,24 @@ class CheckingAccountRestControllerTests {
 	@Test
 	void createAccount() {
 		Account account = new Account("mary", BigDecimal.valueOf(100.00));
-		ResponseEntity<Void> response = restTemplate.postForEntity("/accounts", account, Void.class);
+		ResponseEntity<Void> response = restTemplate
+				.withBasicAuth("mary", "123987")
+				.postForEntity("/accounts", account, Void.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 	}
 
 	@Test
 	void getAccount() {
 		Account account = new Account("oz", BigDecimal.valueOf(350.99));
-		ResponseEntity<Void> response = restTemplate.postForEntity("/accounts", account, Void.class);
+		ResponseEntity<Void> response = restTemplate
+				.withBasicAuth("oz", "abc123")
+				.postForEntity("/accounts", account, Void.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
 		URI location = response.getHeaders().getLocation();
-		ResponseEntity<String> responseAccount = restTemplate.getForEntity(location, String.class);
+		ResponseEntity<String> responseAccount = restTemplate
+				.withBasicAuth("oz", "abc123")
+				.getForEntity(location, String.class);
 		assertThat(responseAccount.getStatusCode()).isEqualTo(HttpStatus.OK);
 
 		DocumentContext doc = JsonPath.parse(responseAccount.getBody());
