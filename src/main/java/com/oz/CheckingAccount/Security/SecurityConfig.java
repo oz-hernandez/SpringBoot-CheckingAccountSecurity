@@ -18,13 +18,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests((auth) -> auth
+        http.httpBasic(Customizer.withDefaults())
+                .csrf(CsrfConfigurer::disable)
+                .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(HttpMethod.POST, "/accounts/**").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/accounts/**").hasRole("USER")
-
-                    .anyRequest().denyAll())
-                .httpBasic(Customizer.withDefaults())
-                .csrf(CsrfConfigurer::disable);
+                    .anyRequest().denyAll());
 
         return http.build();
     }
