@@ -22,6 +22,7 @@ public class SecurityConfig {
                 .csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(HttpMethod.POST, "/accounts/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.PUT, "/accounts/**").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/accounts/**").hasRole("USER")
                     .anyRequest().denyAll());
 
@@ -37,7 +38,11 @@ public class SecurityConfig {
         UserDetails oz = User.withUsername("oz")
                 .password(passwordEncoder.encode("abc123"))
                 .roles("USER").build();
-        return new InMemoryUserDetailsManager(user, oz);
+
+        UserDetails tim = User.withUsername("tim")
+                .password(passwordEncoder.encode("123456"))
+                .roles("USER").build();
+        return new InMemoryUserDetailsManager(user, oz, tim);
     }
 
     @Bean
