@@ -39,8 +39,8 @@ public class AccountController {
     }
 
     @PutMapping("/{id}")
-    private ResponseEntity<Void> updateAccount(@PathVariable Long id, @RequestBody Account account) {
-        Optional<Account> updatedAccount = accountRepository.findById(id);
+    private ResponseEntity<Void> updateAccount(@PathVariable Long id, Principal principal, @RequestBody Account account) {
+        Optional<Account> updatedAccount = Optional.ofNullable(accountRepository.findByIdAndName(id, principal.getName()));
 
         if(updatedAccount.isPresent()) {
             updatedAccount.get().setBalance(updatedAccount.get().getBalance().add(account.getBalance()));
