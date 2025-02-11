@@ -35,15 +35,12 @@ class CheckingAccountRestControllerTests {
 	@Test
 	void getAccount() {
 		Account account = new Account("oz", BigDecimal.valueOf(350.99));
-		ResponseEntity<Void> response = restTemplate
-				.withBasicAuth("oz", "abc123")
-				.postForEntity("/accounts", account, Void.class);
+		restTemplate = restTemplate.withBasicAuth("oz", "abc123");
+		ResponseEntity<Void> response = restTemplate.postForEntity("/accounts", account, Void.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
 		URI location = response.getHeaders().getLocation();
-		ResponseEntity<String> responseAccount = restTemplate
-				.withBasicAuth("oz", "abc123")
-				.getForEntity(location, String.class);
+		ResponseEntity<String> responseAccount = restTemplate.getForEntity(location, String.class);
 		assertThat(responseAccount.getStatusCode()).isEqualTo(HttpStatus.OK);
 
 		DocumentContext doc = JsonPath.parse(responseAccount.getBody());
@@ -82,6 +79,7 @@ class CheckingAccountRestControllerTests {
 	@Test
 	void updateAccountBalance() {
 		Account account = new Account("tim", BigDecimal.valueOf(126.00));
+		restTemplate = restTemplate.withBasicAuth("tim", "123456");
 		URI location = restTemplate.postForLocation("/accounts", account);
 
 		Account updateAccount = new Account(account.getId(), "tim", BigDecimal.valueOf(200.00));
