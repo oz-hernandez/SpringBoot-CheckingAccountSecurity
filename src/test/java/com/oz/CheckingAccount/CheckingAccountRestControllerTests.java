@@ -104,4 +104,30 @@ class CheckingAccountRestControllerTests {
 		balance = doc.read("$.balance");
 		assertThat(balance).isEqualTo(326.00);
 	}
+
+	@Test
+	void shouldNotUpdateAccountYouDontOwn() {
+		Account account = new Account("oz", BigDecimal.valueOf(350.99));
+		URI location = restTemplate
+				.withBasicAuth("oz", "abc123")
+				.postForLocation("/accounts", account, Void.class);
+
+		restTemplate = restTemplate.withBasicAuth("tim", "123456");
+		Account updateAccount = new Account(account.getId(), "oz", BigDecimal.valueOf(200.00));
+		HttpEntity<Account> request = new HttpEntity<>(updateAccount);
+
+		ResponseEntity<Void> response = restTemplate.exchange(location, HttpMethod.PUT, request, Void.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+	}
+
+	@Test
+	void shouldNotUpdateNonexistentAccount() {
+		Account updateAccount = new Account("oz", BigDecimal.valueOf(200.00));
+		HttpEntity<Account> request = new HttpEntity<>(updateAccount);
+
+		ResponseEntity<Void> response = restTemplate
+				.withBasicAuth("oz", "abc123")
+				.exchange("/accounts/999999", HttpMethod.PUT, request, Void.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+	}
 }
